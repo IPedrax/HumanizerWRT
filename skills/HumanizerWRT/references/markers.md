@@ -295,6 +295,29 @@ grammatical slips. Imperfection *correlates* with human authorship; manufacturin
 dishonest and reads as costume. Note the corollary: aggressive copy-editing pushes genuine
 human writing *toward* the AI side, so leave the author's real irregularities alone.
 
+*Measured, not assumed.* A controlled arm tested this. Four models wrote the same story
+twice: once under a process constraint (single pass, no revision, leave flat sentences
+flat, no planted flaws) and once instructed to plant amateur flaws deliberately (a dropped
+article, an unclosed quote, a continuity slip, an abrupt stop). Both were ranked blind
+against real human writing.
+
+| Condition | Mean rank of 12 |
+|---|---|
+| Human | 1.50 |
+| Effort-limited, no planted flaws | 6.75 |
+| **Deliberately flawed** | **9.00** |
+
+Planting flaws was the **worst** condition tested, beaten by the same four models writing
+carefully, and beaten 3 of 4 on the paired comparison. The judge explained why, and the
+explanation is the whole rule: genuine lapses "cluster with other sloppiness," while
+planted ones are "single, isolated, and always positioned at a dramatic hinge." A cat
+renamed in the same appositive construction as the original. A sentence stopping exactly
+on "I think you already." A dropped word that the next line of dialogue corrects, which no
+real typo ever does.
+
+**Placed flaws land on a beat. Real flaws land on nothing.** That is why this cannot be
+faked, and why the rule is absolute rather than a preference.
+
 **G2. Never invent specifics.** Concreteness is the largest measured gap, and it closes
 by *asking the author* for the detail: the name, the number, the date, what actually
 happened, not by hallucinating a plausible one. When a passage needs a specific that
