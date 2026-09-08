@@ -10,6 +10,7 @@ not the exact operationalisations in the source papers. They are for
   audit FILE             marker panel + register-independent flags (--band to score
                          each marker against a human reference distribution)
   diff BASELINE CAND     candidate against a baseline (file or .json from profile)
+  independence FILE...   shared phrasing ACROSS documents: the cross-document tell
 
 Add --json for machine-readable output.
 
@@ -273,6 +274,70 @@ def flags_for(p):
     return out
 
 
+# --- cross-document independence -----------------------------------------------
+#
+# Every blind test of this skill was lost on the same evidence: not any single
+# sentence, but a lattice of phrasing shared between separately generated texts.
+# "had not opened the blinds since March" in three of them. "boiling point of
+# water" as the disenchantment image in two. A verbatim exchange in two more. One
+# judge put it plainly: it ranked on whether the files were independent of each
+# other, not on quality, and several machine texts were better written than the
+# humans it placed above them.
+#
+# A single-document panel cannot see this, and will happily report a clean score
+# on ten texts sharing one skeleton. This does.
+
+# Measured on 159 human same-prompt pairs from r/WritingPrompts, pre-2018: 1.9%
+# of pairs share any span at all. A 160th pair carried 11 and is almost certainly
+# a repost, which is why the share-rate is reported rather than the mean.
+HUMAN_PAIR_SHARE_PCT = 1.9
+
+
+def _spans(tokens, lo=5, hi=14):
+    """All word n-grams in a token list, longest first."""
+    out = {}
+    for n in range(hi, lo - 1, -1):
+        for i in range(len(tokens) - n + 1):
+            out.setdefault(tuple(tokens[i:i + n]), 0)
+            out[tuple(tokens[i:i + n])] += 1
+    return out
+
+
+def _contentful(span, need=3):
+    """Reject stock English.
+
+    A 4-word span carrying two content words ("for a long time", "at the kitchen
+    table") is ordinary phrasing, not convergence. Requiring five words and three
+    content words keeps the evidence blind judges actually cited ("the boiling
+    point of water", "covered every wall of the apartment") and drops the noise.
+    """
+    return sum(1 for w in span if w not in FUNCTION_WORDS) >= need
+
+
+def shared_spans(a, b, lo=5, hi=14):
+    """Maximal word sequences occurring in both token lists.
+
+    Maximal means not contained inside a longer shared span, so one 7-word match
+    is reported once rather than as four overlapping 4-grams.
+    """
+    sa, sb = set(_spans(a, lo, hi)), set(_spans(b, lo, hi))
+    common = {s for s in (sa & sb) if _contentful(s)}
+    maximal = []
+    for s in sorted(common, key=len, reverse=True):
+        if not any(_is_sub(s, m) for m in maximal):
+            maximal.append(s)
+    return maximal
+
+
+def _is_sub(short, long_):
+    n, m = len(short), len(long_)
+    return n < m and any(long_[i:i + n] == short for i in range(m - n + 1))
+
+
+def content_words(tokens, minlen=5):
+    return {w for w in tokens if len(w) >= minlen and w not in FUNCTION_WORDS}
+
+
 # --- human reference bands -----------------------------------------------------
 
 BANDS_FILE = Path(__file__).resolve().parent.parent / "references" / "human-bands.json"
@@ -464,6 +529,80 @@ def main(argv):
         print("\n  Largest divergences first. Move the candidate toward the baseline by "
               "\n  restoring what was stripped (contractions, function words, first "
               "\n  person, causal connectives) before touching anything else.")
+        return 0
+
+    if cmd == "independence":
+        if len(args) < 2:
+            print("independence needs two or more files", file=sys.stderr)
+            return 2
+        docs = []
+        for f in args:
+            t = INLINE_CODE.sub(" ", FENCED.sub(" ", read(f)))
+            docs.append((Path(f).name, [w.lower() for w in WORD.findall(t)]))
+
+        pairs = []
+        for i in range(len(docs)):
+            for j in range(i + 1, len(docs)):
+                sp = shared_spans(docs[i][1], docs[j][1])
+                cw = content_words(docs[i][1]) & content_words(docs[j][1])
+                pairs.append((docs[i][0], docs[j][0], sp, cw))
+
+        # A phrase shared by every document is the prompt talking, not the model.
+        # Convergence lives in spans shared by some but not all.
+        n_doc = len(docs)
+        phrase_df = Counter()
+        for _, _, sp, _ in pairs:
+            for s in sp:
+                phrase_df[s] += 1
+        conv = [(s, sum(1 for _, toks in docs if _is_sub(s, tuple(toks)) or tuple(toks) == s
+                        or " ".join(s) in " ".join(toks)))
+                for s in phrase_df]
+        conv = [(s, d) for s, d in conv if 2 <= d < n_doc or (d == n_doc and n_doc == 2)]
+        conv.sort(key=lambda x: (-x[1], -len(x[0])))
+
+        span_counts = [len(sp) for _, _, sp, _ in pairs]
+        score = statistics.fmean(span_counts) if span_counts else 0.0
+        # Share-rate is the robust statistic. The mean is dominated by outliers:
+        # in the human reference one repost pair carried 11 spans and tripled it.
+        rate = 100 * sum(1 for c in span_counts if c) / len(span_counts) if span_counts else 0.0
+
+        if as_json:
+            print(json.dumps({
+                "documents": [d[0] for d in docs],
+                "convergence": round(score, 2),
+                "share_rate_pct": round(rate, 1),
+                "human_reference_pct": HUMAN_PAIR_SHARE_PCT,
+                "pairs": [{"a": a, "b": b, "shared_spans": len(sp),
+                           "spans": [" ".join(s) for s in sp[:12]],
+                           "shared_content_words": sorted(cw)[:40]}
+                          for a, b, sp, cw in pairs],
+                "convergent_phrases": [{"phrase": " ".join(s), "documents": d}
+                                       for s, d in conv[:40]]}, indent=2))
+            return 0
+
+        print(f"\nINDEPENDENCE   {len(docs)} documents, {len(pairs)} pairs")
+        print(f"  {rate:.1f}% of pairs share a span   "
+              f"(human same-prompt reference: {HUMAN_PAIR_SHARE_PCT}%)")
+        print(f"  convergence: {score:.2f} spans per pair "
+              f"(5 words or longer, 3+ content words)")
+        if rate > HUMAN_PAIR_SHARE_PCT * 2:
+            print(f"  ^^ {rate / HUMAN_PAIR_SHARE_PCT:.1f}x the human rate")
+        print("  " + "-" * 66)
+        for a, b, sp, cw in sorted(pairs, key=lambda p: -len(p[2])):
+            if not sp:
+                continue
+            print(f"  {a} <-> {b}   {len(sp)} shared")
+            for s in sp[:6]:
+                print(f"      \"{' '.join(s)}\"")
+        if conv:
+            print(f"\n  phrases recurring across documents:")
+            for s, d in conv[:12]:
+                print(f"    {d} docs   \"{' '.join(s)}\"")
+        if not any(sp for _, _, sp, _ in pairs):
+            print("  no shared spans found.")
+        print("\n  A phrase in every document is the prompt talking. Convergence is what "
+              "\n  is shared by some and not all. This is the layer blind judges actually "
+              "\n  convicted on, and no single-document panel can see it.")
         return 0
 
     print(f"unknown command: {cmd}", file=sys.stderr)

@@ -72,9 +72,39 @@ invisible in any single document and obvious across several.
 you have stopped losing on vocabulary, rhythm and punctuation. It says nothing about whether
 the *shape* of the piece is one every model reaches for, and that is now the larger share of
 what remains. Vary the structure, not the sentences: whose story it is, where it starts, what
-the visitor wants, whether anything is resolved. If you are producing several pieces, check
-them against each other, because the marker panel cannot see this and will happily report a
-clean score on ten texts with one skeleton.
+the visitor wants, whether anything is resolved.
+
+### Checking independence across documents
+
+The single-document panel cannot see convergence and will report a clean score on ten texts
+sharing one skeleton. So check the set against itself:
+
+```bash
+python3 scripts/stylo.py independence draft1.md draft2.md draft3.md
+```
+
+It reports the share of document pairs carrying a maximal shared span of five or more words
+with three or more content words, which is the evidence blind judges actually convicted on
+("the boiling point of water", "had not opened the blinds since March", and one verbatim
+nine-word exchange).
+
+Calibrated against 159 human same-prompt pairs from the same pre-2018 corpus:
+
+| Pairs | Share a span |
+|---|---|
+| **Human, same prompt** | **1.9%** |
+| Machine, different models | 7.3% |
+| Machine, **same model writing more than once** | **20.8%** |
+
+The actionable finding is the third row. Convergence is roughly **11x** the human rate when
+one model writes several pieces, and only about 4x across different models. Within any single
+batch of four models writing once each, the measured rate was near zero. **The independence
+risk is repetition by one model, not the use of models generally.**
+
+Two cautions. A phrase present in every document is the prompt talking, not convergence, so
+the tool weights spans shared by some and not all. And report the share of pairs rather than
+the mean: in the human reference one repost pair carried 11 spans and tripled the mean on its
+own.
 
 ---
 

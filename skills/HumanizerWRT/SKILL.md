@@ -123,6 +123,14 @@ python3 scripts/stylo.py diff voice.json out.md  # against the author
 python3 scripts/stylo.py audit out.md            # after
 ```
 
+If you produced more than one piece, also check them against each other. The panel above
+is blind to convergence, and shared phrasing across a set is what blind judges actually
+convict on:
+
+```bash
+python3 scripts/stylo.py independence out1.md out2.md out3.md
+```
+
 Show the before/after on the markers that changed and name what you could not fix without
 input from the author. That last part is not optional. See G2.
 
@@ -198,5 +206,5 @@ inside the markers registers as drift and gets overwritten at the next session s
 | `references/voice-profile.md` | Before rewrite or full. Sample handling and failure modes. |
 | `references/always-on.md` | Source of truth for the CLAUDE.md block. Edit here, not there. |
 | `references/ai-vs-human-writing.md` | For the why, the numbers, or a citation. ~40 sources. |
-| `scripts/stylo.py` | `audit` / `profile` / `diff`. Stdlib only, `--json` available. |
+| `scripts/stylo.py` | `audit` / `profile` / `diff` / `independence`. Stdlib only, `--json` available. |
 | `scripts/install.py` | Replicate the always-on block. `--check` / `--quiet` / `--uninstall`. |
