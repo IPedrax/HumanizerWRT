@@ -6,7 +6,7 @@
     "email": "pedro.medeiros@ipedrax.com.br"
   },
   "metadata": {
-    "description": "HumanizerWRT — strip the AI voice out of writing, or never put it there. Five measured layers, ~40 cited studies, and a stdlib stylometry script so it is measurement rather than vibes."
+    "description": "HumanizerWRT: strip the AI voice out of writing, or never put it there. Five measured layers, ~40 cited studies, and a stdlib stylometry script so it is measurement rather than vibes."
   },
   "plugins": [
     {
