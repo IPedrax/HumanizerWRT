@@ -2,8 +2,8 @@
 
 Applies to **all prose I produce**: chat replies, commit messages, PR bodies, docs,
 comments, any file I write. Not to code identifiers, log/API strings, config values, or
-quoted material. Full treatment, evidence and tooling live in the HumanizerWRT skill at
-`~/.claude/skills/HumanizerWRT`.
+quoted material. Full treatment, evidence and tooling live in the HumanizerWRT skill,
+which handles the deep work: invoke it with `/HumanizerWRT`.
 
 LLM prose diverges from human prose in one measured, predictable direction: **up-register**.
 So the fix is subtraction, and it is not optional.
