@@ -169,6 +169,33 @@ whose backward-looking wisdom is presumed rather than argued through causal reas
 perception. Make the reasoning explicit again: say *because*, show the step. Cut the
 retrospective wisdom-framing and the abstract nouns that replaced the argument.
 
+### Embodied and sensory language
+
+Scored on 20,000 parallel stories across 19 models and twelve sensory axes (Lancaster
+sensorimotor norms plus Brysbaert concreteness). Every model differs from humans on at
+least 10 of 12 axes. **The direction flips by family**, so this is the one marker where
+you must know which model wrote the draft:
+
+| Generator | vs human | Fix |
+|---|---|---|
+| Llama, OLMo, Phi, Qwen | significantly **less** sensory language | Restore it: what was felt, smelled, heard, what the body did |
+| GPT | between, GPT-4o closer to human than GPT-3.5 | Check before acting |
+| Gemini | significantly **more** on most axes | Cut it back; it over-reaches into sensory register |
+
+Visual and concreteness are the sharpest splitters, and the most important features when
+a classifier separates human from model on sensory scores alone.
+
+Same cause as everything else: probes show models represent sensory language fine
+(concreteness R²≈0.85 in deep layers), but in the Anthropic RLHF data *rejected* responses
+carry more of it on nearly every axis, correlating with per-family underuse at up to
+r=0.92. They were trained out of it rather than never having learned it.
+
+**Do not accept a single percentage for "AI" here.** Popular versions of this finding
+assign one number to all models. The largest parallel-corpus study finds the direction
+itself is generator-dependent, so no single figure can be right. Sensory strength scored
+against a lexicon is also a different construct from the share of emotion expressions
+using a bodily metaphor; figures from one do not transfer to the other.
+
 ### Emotional range
 
 - Humans show **stronger fear and disgust, and less joy**.

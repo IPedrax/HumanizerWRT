@@ -378,7 +378,53 @@ Across **16 datasets, 9 languages, 9 domains**, 19 annotators reached 87.6% dete
 accuracy, much higher than the near-chance findings of earlier studies. The gaps they
 were exploiting: **concreteness** and **cultural nuance**. [Wang et al. 2025]
 
-### 6.2 Emotional range
+### 6.2 Embodied and sensory language
+
+The sensory half of concreteness, and the one place where the direction of the effect
+**flips by model family**, which makes most popular summaries of it wrong.
+
+Hicke, Hamilton & Mimno (2025) scored **20,000 parallel stories** (1,000 r/WritingPrompts
+prompts, human responses plus 19 models across six families) on twelve sensory axes using
+the Lancaster sensorimotor norms and Brysbaert concreteness norms. Six perceptual
+modalities (haptic, auditory, olfactory, gustatory, visual, interoceptive), five action
+effectors (mouth, hand/arm, foot/leg, head, torso), and concreteness.
+
+- **Every model** differs significantly from human usage on at least **10 of 12 axes**;
+  most differ on all twelve.
+- **Gemini uses significantly *more* sensory language than humans** on most axes.
+  **Llama, OLMo, Phi and Qwen use significantly *less*.** GPT sits between them, with
+  GPT-4o closer to human than GPT-3.5 on nine of twelve axes.
+- Visual and concreteness are the axes that split the families most sharply, and they are
+  the most important features when a classifier separates human from model text on
+  sensory scores alone.
+
+The cause is the same one behind everything else in §1. Linear probes show models *can*
+represent sensory language: concreteness probes reach R²≈0.85 in deeper layers, and most
+axes land at 0.3 to 0.6. They recognise it and decline to use it. In the Anthropic RLHF
+preference dataset, **rejected responses use more sensory language than chosen ones on
+every significant axis** except interoception and mouth effectors, and per-family underuse
+correlates with that pattern at up to **r=0.92**. The authors' conclusion: the models were
+not found to lack the capacity, they were trained out of using it.
+
+There is also an inverse relationship worth noting: the better a model represents a
+sensory axis internally, the further its usage deviates from human (R≥0.45 for most
+models). Recognition and production come apart.
+
+**Design consequence, and it is not one rule.** For most model families the fix is to
+restore concrete sensory detail: what something felt, smelled, sounded like, what the body
+did. For Gemini output the correction runs the other way, because it over-reaches into
+sensory register relative to humans. Any rule of the form "AI uses more/fewer bodily
+metaphors" is stated at the wrong level; the family is the unit, not "AI".
+
+**Caution on popular versions of this finding.** Claims circulate assigning a single
+percentage to "AI" for bodily or somatic metaphor use. Treat those sceptically. This is
+the largest parallel-corpus study on the question and it found the direction itself is
+generator-dependent, so a single figure cannot be right for all of them. Note also that
+sensory *strength* scored against a lexicon is not the same construct as the *share of
+emotion expressions that use a bodily metaphor*, so figures built on the latter are not
+comparable to the numbers above.
+
+### 6.3 Emotional range
 
 - Humans show **stronger negative emotions**: fear, disgust, and **less joy**.
   [Muñoz-Ortiz 2024]
@@ -389,7 +435,7 @@ were exploiting: **concreteness** and **cultural nuance**. [Wang et al. 2025]
 - Annotators: AI "avoids darker or more mature topics," spends little time on the horrors
   and pivots to "hopeful quotes and potential cures." [Russell et al. 2025]
 
-### 6.3 Epistemic-rhetorical miscalibration
+### 6.4 Epistemic-rhetorical miscalibration
 
 LLMs display **rhetorical intensity out of proportion to epistemic grounding**: they
 sound more certain than their evidence warrants, quantified via form-meaning divergence
@@ -397,7 +443,7 @@ and genuine-to-performed epistemic ratio across 0.6M tokens. [2604.19768] Relate
 work finds ChatGPT-4 produces more nominalizations, **fewer human subjects, and fewer
 epistemic stance markers** than human writers. [Jiang & Hyland 2024]
 
-### 6.4 Narrative stance: the deepest measured shift
+### 6.5 Narrative stance: the deepest measured shift
 
 van Nuenen (2026), 300 personal narratives × 3 frontier models × 3 prompt conditions:
 
@@ -714,6 +760,8 @@ Ordered by how much weight this dossier puts on them.
 - Jakesch, M. et al. (2023). *Human heuristics for AI-generated language are flawed.* **PNAS**. PMC10089155
 
 **Discourse & content**
+- Hicke, R.M.M., Hamilton, S., Mimno, D. (2025). *The Zero Body Problem: Probing LLM Use
+  of Sensory Language.* Cornell. arXiv:2504.06393
 - (2025). *QUDsim: Quantifying Discourse Similarities in LLM-Generated Text.* arXiv:2504.09373
 - (2024). *Are Large Language Models Capable of Generating Human-Level Narratives?* arXiv:2407.13248
 - (2026). *Saying More Than They Know: Epistemic-Rhetorical Miscalibration.* arXiv:2604.19768
