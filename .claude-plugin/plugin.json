@@ -1,0 +1,22 @@
+{
+  "name": "humanizerwrt",
+  "version": "1.0.0",
+  "description": "Diagnose and remove the AI voice from writing, and write without it in the first place. Grounded in ~40 peer-reviewed and preprint studies; measures rather than guesses; refuses to fabricate the specifics that would actually close the gap.",
+  "author": {
+    "name": "IPedrax",
+    "email": "pedro.medeiros@ipedrax.com.br"
+  },
+  "license": "MIT",
+  "keywords": [
+    "writing",
+    "editing",
+    "ai-detection",
+    "stylometry",
+    "voice",
+    "prose",
+    "humanize",
+    "ghostwriting",
+    "style-transfer",
+    "linguistics"
+  ]
+}

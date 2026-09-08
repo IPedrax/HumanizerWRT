@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "humanizerwrt",
+  "owner": {
+    "name": "IPedrax",
+    "email": "pedro.medeiros@ipedrax.com.br"
+  },
+  "metadata": {
+    "description": "HumanizerWRT — strip the AI voice out of writing, or never put it there. Five measured layers, ~40 cited studies, and a stdlib stylometry script so it is measurement rather than vibes."
+  },
+  "plugins": [
+    {
+      "name": "humanizerwrt",
+      "source": "./",
+      "category": "writing",
+      "description": "Audit text against the five layers where LLM prose measurably diverges from human prose, rewrite an AI draft toward a specific author's voice using samples of their writing, or draft in-register from the start. Ships a zero-dependency stylometry script and an always-on CLAUDE.md block that installs and repairs itself."
+    }
+  ]
+}
