@@ -106,6 +106,36 @@ the tool weights spans shared by some and not all. And report the share of pairs
 the mean: in the human reference one repost pair carried 11 spans and tripled the mean on its
 own.
 
+**Measuring is not enough; the generation has to be sequential.** Four models writing in
+parallel to one prompt converged at 16.7% of pairs even with the bands applied. Running the
+same four *in sequence*, each reading what came before and required to diverge in shape
+rather than vocabulary, took it to **0.0%**, below the human rate.
+
+That was the largest single gain of any intervention tested:
+
+| Round | Best machine condition | Mean rank |
+|---|---|---|
+| 1 | directions only | 5.25 / 10 |
+| 2 | numeric bands | 5.25 / 10 |
+| 3 | effort-limited | 6.75 / 12 |
+| 4 | **sequential divergence** | **5.50 / 10**, and 4.00 excluding one non-compliant model |
+
+In the fourth round the three top machine slots were all sequential-divergence texts, they
+beat their own parallel counterparts 3 of 4 paired, and for the first time the judge's
+*confidence* moved: it named two of them as "where I would expect to be wrong," saying "if
+any of the polished eight is human, it is one of those two." Both were sequential.
+
+The mechanism is visible in the judge's own reasoning. It convicted the parallel cluster on
+shared props ("chalk worn to a stub", "March as the frozen month", "a tea-coloured
+cardigan") and one shared simile frame, then said plainly that this was "the weaker kind of
+evidence" and that it could not tell from similarity alone whether a cluster was machine or
+human. Texts outside the cluster had to be judged on their own merits, and that is a harder
+call. **Escaping the lattice does not make a text human. It removes the cheapest way to
+catch it.**
+
+Still zero of eight passed as human. Sequential divergence buys about two rank positions
+and a drop in judge confidence, not a pass.
+
 ---
 
 **Restore before you remove, and remove before you add:**
