@@ -10,6 +10,46 @@ leverage over what the model adds than over what it removed (van Nuenen 2026: ad
 tendencies drop ~55% under instruction, subtractive ones only ~10 to 15%). So work the
 restore list first.
 
+## Targets, not directions
+
+Every instruction below has a **band**, because a direction without a ceiling gets
+overshot. This was measured, not assumed: in a pilot where four models drafted with and
+without this checklist, the skill fixed everything it targeted (em dashes failed 4/4
+without it and 0/4 among the models that obeyed the rule) and then overshot on
+contractions, which got *worse* with the checklist than without it. Models given
+"restore contractions" with no upper bound pushed to 53 per 1k against a human median
+of 14.
+
+Reference bands are in `human-bands.json` (n=2,146 human stories, pre-2018, so no LLM
+contamination). **Register-specific: short literary fiction.** For anything else, profile
+the author instead and use their range (`voice-profile.md`).
+
+| Marker | Human p10 to p90 | Median | Failure mode to avoid |
+|---|---|---|---|
+| Contractions / 1k | **0 to 36** | 14 | Overshoot. Fiction is far less contraction-heavy than "sound casual" implies |
+| Sentence-length CV | **0.48 to 0.84** | 0.64 | Overshoot. Above ~0.85 the variance is itself a pattern |
+| Em/en dashes / 1k | **0 to 5.7** | 0 | House rule is 0; the band shows humans rarely exceed it anyway |
+| Lexical diversity (MATTR) | **0.58 to 0.68** | 0.63 | Above the band means synonym-hunting |
+| Function words % | **44.5 to 54.5** | 49.6 | Below the band means content-word stuffing |
+| Nominalisations / 1k | **2.5 to 20** | 8.7 | Both ways. Zero is as unnatural as forty |
+| Long words % | **5.5 to 12.5** | 8.3 | Undershoot. The downshift needs a floor too |
+| Mean word length | **3.9 to 4.6** | 4.2 | Undershoot |
+| Commas / 1k | **28 to 83** | 55 | Overshoot |
+| First person / 1k | **4 to 105** | 55 | Very wide; POV choice dominates |
+| Participials / 1k | **0 to 11** | 3.2 | Overshoot |
+| Three-item lists / 1k | **0 to 2.9** | 0 | Overshoot |
+| Marker vocabulary / 1k | **0 to 2** | 0 | Overshoot |
+| Causal connectives / 1k | **0 to 10** | 3.9 | Undershoot |
+
+Check with `python3 scripts/stylo.py audit draft.md --band`. Watch **deviation**, not the
+in-band count: a count scores a 9% overshoot the same as a 4x one. Human reference texts
+run a deviation around 0.1; the pilot's unaided drafts ran 2.7.
+
+**Do not drive deviation to zero.** Real human texts sit outside about one band. A text
+inside every band is more average than a person, and that is its own tell.
+
+---
+
 **Restore before you remove, and remove before you add:**
 
 | Priority | Move | Why it comes first |

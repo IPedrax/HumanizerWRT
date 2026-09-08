@@ -7,7 +7,8 @@ not the exact operationalisations in the source papers. They are for
 *relative* comparison (author baseline vs candidate), not absolute verdicts.
 
   profile FILE...        marker panel per file + pooled author baseline
-  audit FILE             marker panel + register-independent flags
+  audit FILE             marker panel + register-independent flags (--band to score
+                         each marker against a human reference distribution)
   diff BASELINE CAND     candidate against a baseline (file or .json from profile)
 
 Add --json for machine-readable output.
@@ -272,6 +273,52 @@ def flags_for(p):
     return out
 
 
+# --- human reference bands -----------------------------------------------------
+
+BANDS_FILE = Path(__file__).resolve().parent.parent / "references" / "human-bands.json"
+
+
+def load_bands():
+    try:
+        return json.loads(BANDS_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def band_report(p, doc):
+    """Score each marker against the human p10..p90 band.
+
+    Returns (rows, inside, deviation). The headline number is *deviation*: how far
+    outside the band a text sits, summed and measured in band-widths. A plain count
+    of markers-in-band was tried first and is misleading, because it scores a 9%
+    overshoot the same as a 4x one. On the pilot set a control text scored 13 of 14
+    in-band while carrying a single em-dash overshoot of ~3 band-widths, and both a
+    blind human-ranking and a centroid-distance measure placed it near the bottom.
+    Deviation agrees with them; the count does not.
+
+    The target is to land INSIDE the band, not at the median. Real human texts sit
+    outside about one band on average, so scoring 'in' everywhere means the text is
+    more average than a person, which is its own tell.
+    """
+    rows, inside, deviation = [], 0, 0.0
+    for m, b in doc["bands"].items():
+        v = p.get(m)
+        if v is None:
+            continue
+        lo, mid, hi = b["p10"], b["p50"], b["p90"]
+        width = (hi - lo) or 1
+        if v > hi:
+            where, off = "above", (v - hi) / width
+        elif v < lo:
+            where, off = "below", (lo - v) / width
+        else:
+            where, off = "in", 0.0
+        inside += where == "in"
+        deviation += off
+        rows.append((m, v, lo, mid, hi, where, off))
+    return rows, inside, deviation
+
+
 # --- output -------------------------------------------------------------------
 
 ORDER = [k for k in panel("a b. c d.") if not k.startswith("_")]
@@ -310,8 +357,10 @@ def main(argv):
     if len(argv) < 2 or argv[1] in ("-h", "--help"):
         print(__doc__)
         return 0
-    cmd, args = argv[1], [a for a in argv[2:] if a != "--json"]
+    FLAGSET = {"--json", "--band"}
+    cmd, args = argv[1], [a for a in argv[2:] if a not in FLAGSET]
     as_json = "--json" in argv[2:]
+    as_band = "--band" in argv[2:]
 
     if cmd == "profile":
         if not args:
@@ -342,12 +391,37 @@ def main(argv):
             print("audit needs exactly one file", file=sys.stderr)
             return 2
         p = panel(read(args[0]))
+        doc = load_bands() if as_band else None
+        if as_band and not doc:
+            print(f"no band file at {BANDS_FILE}", file=sys.stderr)
+            return 2
         if as_json:
-            print(json.dumps({"panel": p, "flags": [
-                {"marker": k, "value": v, "note": m} for k, v, m in flags_for(p)]},
-                indent=2))
+            out = {"panel": p, "flags": [
+                {"marker": k, "value": v, "note": m} for k, v, m in flags_for(p)]}
+            if doc:
+                rows, inside, dev = band_report(p, doc)
+                out["band"] = {"register": doc["register"], "n": doc["n"],
+                               "deviation": round(dev, 3),
+                               "inside": inside, "of": len(rows),
+                               "markers": [{"marker": m, "value": v, "p10": lo, "p50": md,
+                                            "p90": hi, "where": w, "off": round(o, 3)}
+                                           for m, v, lo, md, hi, w, o in rows]}
+            print(json.dumps(out, indent=2))
             return 0
         show(p, Path(args[0]).name)
+        if doc:
+            rows, inside, dev = band_report(p, doc)
+            print(f"\nHUMAN BAND   deviation {dev:.2f} band-widths   ({inside}/{len(rows)} in band)")
+            print(f"  reference: {doc['register']}, n={doc['n']}")
+            print("  " + "-" * 66)
+            for m, v, lo, md, hi, w, o in sorted(rows, key=lambda r: -r[6]):
+                mark = "   " if w == "in" else ("^^ " if w == "above" else "vv ")
+                tail = f"  +{o:.2f}w" if o else ""
+                print(f"  {mark}{m:<24}{v:>9}   band {lo:g} .. {hi:g}{tail}")
+            print("\n  Deviation is the number to watch, not the in-band count: a count "
+                  "\n  scores a 9% overshoot the same as a 4x one. Human reference texts "
+                  "\n  run about 0.1. Aim inside the band, not at the median, because a "
+                  "\n  text inside every band is more average than a person.")
         fl = flags_for(p)
         print(f"\nFLAGS ({len(fl)})")
         print("-" * 40)

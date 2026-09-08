@@ -1,0 +1,82 @@
+{
+ "_README": "Human reference bands for stylo.py --band. Register-specific: short literary fiction, r/WritingPrompts, all posts pre-2018 so no LLM contamination. Do NOT apply these to technical, academic or business prose; for those, profile the author instead (see voice-profile.md). Target is to land INSIDE p10-p90, not at p50: real human texts sit outside 1 band on average, so a text inside every band is more average than a person.",
+ "source": "euclaise/writingprompts",
+ "register": "short literary fiction",
+ "n": 2146,
+ "length_words": [
+  300,
+  900
+ ],
+ "bands": {
+  "mattr": {
+   "p10": 0.577,
+   "p50": 0.628,
+   "p90": 0.675
+  },
+  "sent_len_cv": {
+   "p10": 0.476,
+   "p50": 0.641,
+   "p90": 0.841
+  },
+  "function_word_pct": {
+   "p10": 44.5,
+   "p50": 49.6,
+   "p90": 54.45
+  },
+  "contraction_per_k": {
+   "p10": 0.0,
+   "p50": 13.54,
+   "p90": 36.515
+  },
+  "first_person_per_k": {
+   "p10": 3.93,
+   "p50": 55.175,
+   "p90": 105.195
+  },
+  "nominalisation_per_k": {
+   "p10": 2.465,
+   "p50": 8.73,
+   "p90": 20.395
+  },
+  "participial_per_k": {
+   "p10": 0.0,
+   "p50": 3.225,
+   "p90": 10.925
+  },
+  "long_word_pct": {
+   "p10": 5.5,
+   "p50": 8.3,
+   "p90": 12.5
+  },
+  "mean_word_len": {
+   "p10": 3.93,
+   "p50": 4.205,
+   "p90": 4.56
+  },
+  "comma_per_k": {
+   "p10": 27.805,
+   "p50": 55.03,
+   "p90": 82.825
+  },
+  "em_dash_per_k": {
+   "p10": 0.0,
+   "p50": 0.0,
+   "p90": 5.72
+  },
+  "tricolon_per_k": {
+   "p10": 0.0,
+   "p50": 0.0,
+   "p90": 2.915
+  },
+  "marker_rare_per_k": {
+   "p10": 0.0,
+   "p50": 0.0,
+   "p90": 1.95
+  },
+  "causal_connective_per_k": {
+   "p10": 0.0,
+   "p50": 3.865,
+   "p90": 10.31
+  }
+ }
+}
