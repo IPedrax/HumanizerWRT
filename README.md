@@ -43,12 +43,41 @@ Layer 5 is the one surface humanizers never touch, and it is plausibly the large
 ## <img src="assets/icons/sparkles.svg" width="20" align="absmiddle" alt="" /> What it does
 
 - **Measures instead of guessing.** A 24-marker panel computes lexical diversity (MATTR, MTLD), entropy proxies, sentence-length variance, late-stage volatility decay, nominalisation and participial rates, function-word share, contraction and first-person density, causal connectives, tricolon and "not X but Y" counts, and marker-vocabulary hits. Stdlib only.
+- **Scores against a real human distribution, not a hunch.** `--band` checks every marker against percentiles measured on 2,146 human stories written before ChatGPT existed, so no LLM contamination. The headline number is *deviation in band-widths*, because a plain in-band count scores a 9% overshoot the same as a 4x one. Human reference texts run about 0.1.
+- **Catches the tell a single-document check cannot see.** `independence` compares your drafts against each other and reports shared phrasing, calibrated on 159 human same-prompt pairs. Every blind test of this skill was lost on that layer rather than on any single sentence.
 - **Profiles a real person, not "human" in the abstract.** Feed it three to five things the author actually wrote and it builds a median baseline *plus the observed range*, because how much someone varies is itself part of their voice.
 - **Reads the layer a script cannot.** Stance, concreteness, emotional range, epistemic calibration. The tool covers layers 1 to 4 partially and layer 5 not at all, and the skill says so rather than pretending the number is the answer.
 - **Prefers editing to regenerating.** AI-edited human text sits far closer to its human source (0.80 AUROC) than AI-generated text does (0.97), and moves entropy the *opposite* way. Where a real draft exists underneath, it edits that, and it tells you which it did.
 - **Installs its own rules.** The highest-yield subset replicates into `CLAUDE.md` between marker comments, and a `SessionStart` hook repairs the block if it is deleted and updates it when the source changes. Idempotent, atomic, backed up, and removable with one command.
 - **Refuses to fabricate.** No invented typos, no manufactured hesitation, no plausible-sounding anecdotes, quotes or statistics. Concreteness is the largest measured gap and it closes by *asking the author* for the real detail. The skill flags the gap and asks.
 - **States its limits.** No rewriting makes a *body of work* look human: detection recovers from 0.55 AUROC at one sample to 0.88 at fifty. And detectors misfire on genuine human writing regardless, rating the median formal native-speaker essay 99.5% likely AI while clearing real high-temperature AI at 10.5%.
+
+---
+
+## <img src="assets/icons/check.svg" width="20" align="absmiddle" alt="" /> What the testing found
+
+Four rounds of blind evaluation. Four Claude variants wrote the same story under different conditions; real pre-2018 Reddit stories on the identical prompt went in alongside them; a separate model ranked every text for humanness without ever seeing which was which.
+
+Mean rank is only comparable **within** a round, because each round used a different mix of texts. So here is each round's own contest, with humans scoring 1.50 in every single one:
+
+| Round | Treatment | vs | Control | Paired wins |
+|---|---|---|---|---|
+| 1 | directions only **5.25** | beats | no skill 7.75 | 4 of 4 |
+| 2 | numeric bands **5.25** | beats | no skill 7.75 | 4 of 4 |
+| 3 | effort-limited **6.75** | beats | deliberately flawed 9.00 | 3 of 4 |
+| 4 | sequential divergence **5.50** | beats | parallel + bands 7.50 | 3 of 4 |
+
+**It reliably makes writing better.** It won its paired comparison in every round, 14 of 16 pairings overall, and never lost a round.
+
+**It does not make writing human.** Across four rounds and 34 machine texts, **zero** passed as human. Every human text outranked every machine text, every time.
+
+Three findings that changed the skill, each of them a surprise:
+
+- **Fixing the surface buys nothing on its own.** Giving models the bands plus the checking tool cut deviation a hundredfold, from 0.91 band-widths to 0.009, better than the human reference texts. The blind ranking did not move at all: 5.25 before, 5.25 after. The tell simply relocated to discourse structure.
+- **Faking human error makes it worse.** Planting amateur flaws on purpose was the worst condition tested, losing to the same models writing carefully. Genuine lapses "cluster with other sloppiness"; planted ones are "single, isolated, and always positioned at a dramatic hinge." Placed flaws land on a beat. Real flaws land on nothing.
+- **The largest gain came from cross-document independence.** Generating in sequence, each model diverging in shape from what came before, took shared phrasing from 16.7% of pairs to 0.0%, below the human rate, and was the only intervention to move the judge's *confidence* rather than just its ordering.
+
+Everything in this README that makes a claim about effectiveness has a number behind it. The full protocol, the negative results, and the judge's own reasoning are in [`markers.md`](skills/HumanizerWRT/references/markers.md).
 
 ---
 
@@ -128,22 +157,34 @@ Just describe the problem:
 Or run the tooling directly:
 
 ```bash
-python3 scripts/stylo.py audit draft.md                       # panel + flags
+python3 scripts/stylo.py audit draft.md --band                # panel, flags, human bands
 python3 scripts/stylo.py profile me1.md me2.md me3.md --json > voice.json
 python3 scripts/stylo.py diff voice.json draft.md             # worklist, biggest gap first
+python3 scripts/stylo.py independence a.md b.md c.md          # do your drafts converge?
 ```
 
 ```
-$ python3 scripts/stylo.py audit draft.md
+$ python3 scripts/stylo.py audit draft.md --band
 
-  mattr                      0.7579        nominalisation_per_k       152.63
-  sent_len_cv                0.483         function_word_pct          31.6
-  contraction_per_k          5.26          marker_rare_per_k          78.95
+HUMAN BAND   deviation 2.94 band-widths   (13/14 in band)
+  reference: short literary fiction, n=2146
+  ^^ em_dash_per_k               22.54   band 0 .. 5.72  +2.94w
+     contraction_per_k           20.49   band 0 .. 36.515
 
 FLAGS (6)
   [marker_rare_per_k = 78.95]  Marker vocabulary is dense...
   [verbal_tics = 2]            Sycophantic opener present...
   [tricolon_per_k = 10.53]     Frequent three-item lists...
+```
+
+```
+$ python3 scripts/stylo.py independence draft1.md draft2.md draft3.md draft4.md
+
+INDEPENDENCE   4 documents, 6 pairs
+  50.0% of pairs share a span   (human same-prompt reference: 1.9%)
+  ^^ 26.3x the human rate
+      "that's not my responsibility marcus said but his voice"
+      "the equations covered every wall"
 ```
 
 ---
@@ -156,12 +197,13 @@ FLAGS (6)
 skills/HumanizerWRT/
 ├── SKILL.md                        router: four modes, five guardrails
 ├── references/
-│   ├── markers.md                  the operational five-layer checklist
+│   ├── markers.md                  the five-layer checklist + measured target bands
 │   ├── voice-profile.md            getting samples, what to measure, failure modes
 │   ├── always-on.md                source of truth for the CLAUDE.md block
+│   ├── human-bands.json            percentiles from 2,146 pre-2018 human stories
 │   └── ai-vs-human-writing.md      the dossier: ~40 sources, conflicts flagged
 └── scripts/
-    ├── stylo.py                    audit / profile / diff. 24 markers, stdlib
+    ├── stylo.py                    audit / profile / diff / independence. stdlib
     └── install.py                  replicate the block. --check / --quiet / --uninstall
 ```
 
@@ -179,6 +221,10 @@ claude plugin validate .
 
 ```bash
 python3 skills/HumanizerWRT/scripts/install.py --check
+```
+
+```bash
+python3 skills/HumanizerWRT/scripts/stylo.py audit README.md --band
 ```
 
 ---
