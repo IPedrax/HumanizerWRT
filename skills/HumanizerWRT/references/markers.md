@@ -48,6 +48,34 @@ run a deviation around 0.1; the pilot's unaided drafts ran 2.7.
 **Do not drive deviation to zero.** Real human texts sit outside about one band. A text
 inside every band is more average than a person, and that is its own tell.
 
+### The bands are necessary and not sufficient. This was measured.
+
+Giving four models these bands plus the checking tool cut mean deviation from 0.91 band-widths
+to 0.009, a hundredfold improvement, with three of four landing at exactly 0.00, which is
+*better than the human reference texts* (0.056 and 0.091).
+
+**The blind ranking did not move at all.** Mean rank of the skill group was 5.25 out of 10
+before the bands existed and 5.25 after. Humans stayed at 1.50. One model hit 0.00 deviation
+and still placed 9th of 10.
+
+The judge explained why, and it is Layer 4, not Layer 1 to 3. It convicted the machine texts
+on a shared *discourse skeleton*: a recluse who has not opened the blinds, an unremarkable
+visitor in a cardigan, one long monologue arguing that certainty destroys faith, a quiet
+closing gesture. Two texts independently opened with blinds unopened "since March"; two used
+the identical "he didn't scream / he'd rehearsed this / it felt almost ___" beat.
+
+So the bands close the surface layers and the tell simply relocates. This is §5.1 of the
+dossier arriving in practice: LLM texts reuse the same discourse skeleton across a set,
+invisible in any single document and obvious across several.
+
+**What follows for how you use this.** Deviation is a floor, not a target. Passing it means
+you have stopped losing on vocabulary, rhythm and punctuation. It says nothing about whether
+the *shape* of the piece is one every model reaches for, and that is now the larger share of
+what remains. Vary the structure, not the sentences: whose story it is, where it starts, what
+the visitor wants, whether anything is resolved. If you are producing several pieces, check
+them against each other, because the marker panel cannot see this and will happily report a
+clean score on ten texts with one skeleton.
+
 ---
 
 **Restore before you remove, and remove before you add:**
